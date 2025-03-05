@@ -42,10 +42,10 @@ variable "tags" {
 
 variable "georeplications" {
   type = list(object({
-    location                 = string
+    location                  = string
     regional_endpoint_enabled = optional(bool, null)
-    zone_redundancy_enabled  = optional(bool, false)
-    tags                     = optional(map(string), {})
+    zone_redundancy_enabled   = optional(bool, false)
+    tags                      = optional(map(string), {})
   }))
   description = <<EOT
 A list of geo-replication definitions (Premium SKU only).
@@ -58,7 +58,7 @@ Each element must be an object with:
 **IMPORTANT**: The list of georeplications cannot include the main registry location,
 and if multiple replications are provided, they should be sorted by location alphabetically.
 EOT
-  default = []
+  default     = []
 }
 
 variable "quarantine_policy_enabled" {
@@ -185,5 +185,5 @@ Each object must have:
   - target_repo (string)
   - credential_set_id (optional string)
 EOT
-  default = []
+  default     = []
 }

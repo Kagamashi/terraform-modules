@@ -24,16 +24,16 @@ resource "azurerm_container_registry" "this" {
 
   # Only set these Premium-only settings if the SKU is Premium
   quarantine_policy_enabled = local.sku_is_premium ? var.quarantine_policy_enabled : null
-  retention_policy_in_days  = local.sku_is_premium ? var.retention_policy_in_days  : null
-  trust_policy_enabled      = local.sku_is_premium ? var.trust_policy_enabled      : null
-  zone_redundancy_enabled   = local.sku_is_premium ? var.zone_redundancy_enabled   : null
-  export_policy_enabled     = local.sku_is_premium ? var.export_policy_enabled     : null
+  retention_policy_in_days  = local.sku_is_premium ? var.retention_policy_in_days : null
+  trust_policy_enabled      = local.sku_is_premium ? var.trust_policy_enabled : null
+  zone_redundancy_enabled   = local.sku_is_premium ? var.zone_redundancy_enabled : null
+  export_policy_enabled     = local.sku_is_premium ? var.export_policy_enabled : null
 
   # For Standard or Premium SKUs
   anonymous_pull_enabled = (local.sku_is_standard || local.sku_is_premium) ? var.anonymous_pull_enabled : null
 
   # For Premium only
-  data_endpoint_enabled      = local.sku_is_premium ? var.data_endpoint_enabled      : null
+  data_endpoint_enabled      = local.sku_is_premium ? var.data_endpoint_enabled : null
   network_rule_bypass_option = var.network_rule_bypass_option
 
   public_network_access_enabled = var.public_network_access_enabled
@@ -42,10 +42,10 @@ resource "azurerm_container_registry" "this" {
   dynamic "georeplications" {
     for_each = local.apply_georeplica ? var.georeplications : []
     content {
-      location                = georeplications.value.location
+      location                  = georeplications.value.location
       regional_endpoint_enabled = lookup(georeplications.value, "regional_endpoint_enabled", null)
-      zone_redundancy_enabled = lookup(georeplications.value, "zone_redundancy_enabled", false)
-      tags                    = lookup(georeplications.value, "tags", {})
+      zone_redundancy_enabled   = lookup(georeplications.value, "zone_redundancy_enabled", false)
+      tags                      = lookup(georeplications.value, "tags", {})
     }
   }
 
