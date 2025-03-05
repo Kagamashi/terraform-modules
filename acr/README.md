@@ -32,6 +32,8 @@ module "acr" {
 }
 ```
 
+---
+
 ## Notes:
 
 ### Premium SKU Requirements

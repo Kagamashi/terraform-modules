@@ -1,204 +1,157 @@
-##########
-# VARIABLES.TF
-##########
-variable "cluster_name" {
-  description = "The name of the AKS cluster."
+variable "name" {
   type        = string
+  description = "Specifies the name of the AKS cluster (must be unique)."
 }
 
 variable "location" {
-  description = "The Azure region where the AKS cluster will be deployed."
   type        = string
+  description = "Specifies the Azure location where the AKS cluster will be created."
 }
 
 variable "resource_group_name" {
-  description = "The name of the resource group containing the AKS cluster."
   type        = string
+  description = "Name of the resource group in which to create the AKS cluster."
 }
 
 variable "dns_prefix" {
-  description = "The DNS prefix for the AKS cluster."
   type        = string
+  description = <<EOT
+Optional DNS prefix for the cluster. Must begin and end with a letter or number, 
+contain only letters, numbers, and hyphens, and be 1-54 characters. 
+Changing this forces a new resource to be created.
+EOT
+  default     = null
 }
 
 variable "kubernetes_version" {
-  description = "The Kubernetes version to use for the AKS cluster."
   type        = string
-  default     = ""
-}
-
-variable "private_cluster_enabled" {
-  description = "Enable private AKS cluster."
-  type        = bool
-  default     = false
+  description = <<EOT
+Version of Kubernetes to deploy (e.g. 1.25, 1.26.3, etc.). 
+If not specified, the latest recommended version is used.
+EOT
+  default     = null
 }
 
 variable "sku_tier" {
-  description = "The SKU Tier of the AKS cluster."
   type        = string
+  description = <<EOT
+The SKU Tier of the AKS cluster. Possible values: "Free", "Standard", "Premium".
+Defaults to "Free".
+EOT
   default     = "Free"
 }
 
-variable "node_count" {
-  description = "The number of nodes in the default node pool."
-  type        = number
-  default     = 3
-}
-
-variable "vm_size" {
-  description = "The size of the virtual machines in the node pool."
-  type        = string
-  default     = "Standard_D2s_v3"
-}
-
-variable "os_disk_size_gb" {
-  description = "The OS disk size of the node pool in GB."
-  type        = number
-  default     = 30
-}
-
-variable "enable_auto_scaling" {
-  description = "Enable auto-scaling for the default node pool."
+variable "private_cluster_enabled" {
   type        = bool
-  default     = true
-}
-
-variable "min_node_count" {
-  description = "The minimum node count when auto-scaling is enabled."
-  type        = number
-  default     = 1
-}
-
-variable "max_node_count" {
-  description = "The maximum node count when auto-scaling is enabled."
-  type        = number
-  default     = 5
-}
-
-variable "subnet_id" {
-  description = "The subnet ID for the AKS cluster."
-  type        = string
-  default     = ""
-}
-
-variable "node_pool_type" {
-  description = "The type of node pool, either 'VirtualMachineScaleSets' or 'AvailabilitySet'."
-  type        = string
-  default     = "VirtualMachineScaleSets"
-}
-
-variable "max_pods" {
-  description = "The maximum number of pods per node."
-  type        = number
-  default     = 110
-}
-
-variable "node_zones" {
-  description = "The availability zones for the node pool."
-  type        = list(string)
-  default     = ["1", "2", "3"]
-}
-
-variable "identity_type" {
-  description = "The identity type of the AKS cluster, either 'SystemAssigned' or 'UserAssigned'."
-  type        = string
-  default     = "SystemAssigned"
-}
-
-variable "network_plugin" {
-  description = "The network plugin to use for the AKS cluster."
-  type        = string
-  default     = "azure"
-  validation {
-    condition     = contains(["azure", "kubenet"], var.network_plugin)
-    error_message = "Valid values are 'azure' or 'kubenet'."
-  }
-}
-
-variable "network_policy" {
-  description = "The network policy to use for the AKS cluster."
-  type        = string
-  default     = "calico"
-  validation {
-    condition     = contains(["calico", "azure", "cilium"], var.network_policy)
-    error_message = "Valid values are 'calico', 'azure', or 'cilium'."
-  }
-}
-
-variable "outbound_type" {
-  description = "The outbound type for AKS cluster networking."
-  type        = string
-  default     = "loadBalancer"
-}
-
-variable "pod_cidr" {
-  description = "The CIDR range for the pods."
-  type        = string
-  default     = ""
-}
-
-variable "service_cidr" {
-  description = "The CIDR range for the services."
-  type        = string
-  default     = ""
-}
-
-variable "dns_service_ip" {
-  description = "The DNS service IP for the cluster."
-  type        = string
-  default     = ""
-}
-
-variable "log_analytics_workspace_id" {
-  description = "The ID of the Log Analytics Workspace for monitoring."
-  type        = string
-  default     = ""
-}
-
-variable "auto_scaler_expander" {
-  description = "The expander for the auto-scaler."
-  type        = string
-  default     = "random"
-}
-
-variable "balance_similar_node_groups" {
-  description = "Balance similar node groups when scaling."
-  type        = bool
+  description = <<EOT
+Specifies whether this AKS cluster should only have internal IP addresses for 
+the API server. Defaults to false. Changing this forces a new resource to be created.
+EOT
   default     = false
 }
 
-variable "max_graceful_termination_sec" {
-  description = "Maximum graceful termination time in seconds."
-  type        = number
-  default     = 600
+variable "private_dns_zone_id" {
+  type        = string
+  description = <<EOT
+Specifies the ID of a Private DNS Zone, "System", or "None" to manage 
+a private AKS cluster. Only used when private_cluster_enabled = true.
+EOT
+  default     = null
 }
 
-variable "scale_down_delay_after_add" {
-  description = "Delay before a newly added node is considered for scale-down."
-  type        = string
-  default     = "10m"
+variable "network_profile" {
+  type = object({
+    network_plugin     = optional(string, null) # e.g., "azure", "kubenet", or "none"
+    network_policy     = optional(string, null) # e.g., "calico", "azure", "cilium"
+    load_balancer_sku  = optional(string, "standard")
+    outbound_type      = optional(string, "loadBalancer") # e.g. "loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"
+    service_cidr       = optional(string, null)
+    dns_service_ip     = optional(string, null)
+    docker_bridge_cidr = optional(string, null)
+    pod_cidr           = optional(string, null)
+  })
+  description = <<EOT
+An object describing the network profile configuration for the AKS cluster:
+  - network_plugin ("azure", "kubenet", or "none")
+  - network_policy ("calico", "azure", or "cilium")
+  - load_balancer_sku ("standard" or "basic")
+  - outbound_type ("loadBalancer", "userDefinedRouting", "managedNATGateway", or "userAssignedNATGateway")
+  - service_cidr, dns_service_ip, docker_bridge_cidr, pod_cidr
+Set to null or omit fields you don't need.
+EOT
+  default     = null
 }
 
-variable "scale_down_unneeded" {
-  description = "Time before an unneeded node is considered for scale-down."
-  type        = string
-  default     = "10m"
+variable "default_node_pool" {
+  type = object({
+    name               = string
+    vm_size            = string
+    node_count         = number
+    auto_scaling       = optional(bool, false)
+    min_count          = optional(number, null)
+    max_count          = optional(number, null)
+    os_disk_size_gb    = optional(number, null)
+    os_disk_type       = optional(string, "Managed") # "Ephemeral", "Managed"
+    vnet_subnet_id     = optional(string, null)      # For advanced networking
+    max_pods           = optional(number, null)
+    availability_zones = optional(list(string), null) # e.g. ["1","2","3"]
+  })
+  description = <<EOT
+Configuration for the default (system) node pool. 
+  - name: Node pool name (required).
+  - vm_size: Azure VM size (required).
+  - node_count: number of nodes (required).
+  - auto_scaling: should auto scaler be enabled?
+  - min_count, max_count: used only if auto_scaling = true.
+  - os_disk_size_gb, os_disk_type: disk config for each node.
+  - vnet_subnet_id: subnet ID if using advanced networking (azure CNI).
+  - max_pods: maximum pods per node.
+  - availability_zones: List of zones for zone redundancy.
+EOT
 }
 
-variable "scale_down_unready" {
-  description = "Time before an unready node is considered for scale-down."
-  type        = string
-  default     = "20m"
+variable "identity" {
+  type = object({
+    type         = string
+    identity_ids = optional(list(string), null)
+  })
+  description = <<EOT
+An identity block for the AKS cluster. 
+  - type can be "SystemAssigned" or "UserAssigned".
+  - identity_ids is required only if type = "UserAssigned".
+EOT
+  default     = null
 }
 
-variable "scan_interval" {
-  description = "The scan interval for the auto-scaler."
-  type        = string
-  default     = "10s"
+variable "role_based_access_control_enabled" {
+  type        = bool
+  description = "Specifies if Role Based Access Control (RBAC) is enabled. Defaults to true."
+  default     = true
+}
+
+variable "azure_rbac_enabled" {
+  type        = bool
+  description = "Specifies if Azure RBAC for Kubernetes authorization is enabled."
+  default     = false
+}
+
+variable "aad_admin_group_object_ids" {
+  type        = list(string)
+  description = <<EOT
+A list of Azure AD group Object IDs that should have cluster admin role. 
+Only used if azure_rbac_enabled = true or for AAD integration.
+EOT
+  default     = []
+}
+
+variable "http_application_routing_enabled" {
+  type        = bool
+  description = "Specifies whether the HTTP Application Routing addon is enabled."
+  default     = false
 }
 
 variable "tags" {
-  description = "A map of tags to apply to the resources."
   type        = map(string)
+  description = "A mapping of tags to assign to the resource."
   default     = {}
 }

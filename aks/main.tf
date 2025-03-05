@@ -1,56 +1,97 @@
-##########
-# MAIN.TF
-##########
-resource "azurerm_kubernetes_cluster" "aks" {
-  name                = var.cluster_name
+##########################
+# Local condition checks #
+##########################
+locals {
+  use_identity          = var.identity != null
+  identity_is_user      = local.use_identity && lower(var.identity.type) == "userassigned"
+  identity_is_system    = local.use_identity && lower(var.identity.type) == "systemassigned"
+  use_network_profile   = var.network_profile != null
+  private_cluster_logic = var.private_cluster_enabled ? true : false
+}
+
+#################################
+# AKS Resource: azurerm_kubernetes_cluster
+#################################
+resource "azurerm_kubernetes_cluster" "this" {
+  name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
-  dns_prefix          = var.dns_prefix
 
-  kubernetes_version      = var.kubernetes_version
+  # If user doesn't supply a dns_prefix, and it's a public cluster, Azure auto-generates one.
+  # For a private cluster, you do need to specify either dns_prefix or dns_prefix_private_cluster,
+  # but we can do some logic here. We'll pass dns_prefix if provided.
+  dns_prefix = var.dns_prefix
+
+  kubernetes_version = var.kubernetes_version
+  sku_tier           = var.sku_tier
+
+  # Private cluster config
   private_cluster_enabled = var.private_cluster_enabled
-  sku_tier                = var.sku_tier
 
+  # If user supplies private_dns_zone_id and private cluster is enabled
+  private_dns_zone_id = var.private_cluster_enabled ? var.private_dns_zone_id : null
+
+  # Node Resource Group. If you want a custom node RG, define it here:
+  # node_resource_group = "my-custom-noderesourcegroup"
+
+  # RBAC
+  role_based_access_control_enabled = var.role_based_access_control_enabled
+
+  # Azure AD -> azure_rbac_enabled
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = var.azure_rbac_enabled ? [true] : []
+    content {
+      tenant_id              = null
+      azure_rbac_enabled     = var.azure_rbac_enabled
+      admin_group_object_ids = var.aad_admin_group_object_ids
+    }
+  }
+
+  # HTTP Application Routing
+  http_application_routing_enabled = var.http_application_routing_enabled
+
+  # Identity
+  dynamic "identity" {
+    for_each = local.use_identity ? [var.identity] : []
+    content {
+      type         = identity.value.type
+      identity_ids = lookup(identity.value, "identity_ids", null)
+    }
+  }
+
+  # Network profile (optional)
+  dynamic "network_profile" {
+    for_each = local.use_network_profile ? [var.network_profile] : []
+    content {
+      network_plugin    = lookup(network_profile.value, "network_plugin", null)
+      network_policy    = lookup(network_profile.value, "network_policy", null)
+      load_balancer_sku = lookup(network_profile.value, "load_balancer_sku", "standard")
+      outbound_type     = lookup(network_profile.value, "outbound_type", "loadBalancer")
+      service_cidr      = lookup(network_profile.value, "service_cidr", null)
+      dns_service_ip    = lookup(network_profile.value, "dns_service_ip", null)
+      pod_cidr          = lookup(network_profile.value, "pod_cidr", null)
+    }
+  }
+
+  #################################
+  # Default Node Pool (required)  #
+  #################################
   default_node_pool {
-    name                = "default"
-    node_count          = var.node_count
-    vm_size             = var.vm_size
-    os_disk_size_gb     = var.os_disk_size_gb
-    enable_auto_scaling = var.enable_auto_scaling
-    min_count           = var.min_node_count
-    max_count           = var.max_node_count
-    vnet_subnet_id      = var.subnet_id
-    type                = var.node_pool_type
-    max_pods            = var.max_pods
-    zones               = var.node_zones
-  }
+    name            = var.default_node_pool.name
+    vm_size         = var.default_node_pool.vm_size
+    node_count      = var.default_node_pool.node_count
+    os_disk_size_gb = var.default_node_pool.os_disk_size_gb
+    os_disk_type    = var.default_node_pool.os_disk_type
+    vnet_subnet_id  = var.default_node_pool.vnet_subnet_id
+    max_pods        = var.default_node_pool.max_pods
 
-  identity {
-    type = var.identity_type
-  }
+    # If availability_zones is non-empty, set it
+    zones = var.default_node_pool.availability_zones != null ? var.default_node_pool.availability_zones : []
 
-  network_profile {
-    network_plugin    = var.network_plugin
-    network_policy    = var.network_policy
-    load_balancer_sku = "standard"
-    outbound_type     = var.outbound_type
-    pod_cidr          = var.pod_cidr
-    service_cidr      = var.service_cidr
-    dns_service_ip    = var.dns_service_ip
-  }
-
-  oms_agent {
-    log_analytics_workspace_id = var.log_analytics_workspace_id
-  }
-
-  auto_scaler_profile {
-    expander                     = var.auto_scaler_expander
-    balance_similar_node_groups  = var.balance_similar_node_groups
-    max_graceful_termination_sec = var.max_graceful_termination_sec
-    scale_down_delay_after_add   = var.scale_down_delay_after_add
-    scale_down_unneeded          = var.scale_down_unneeded
-    scale_down_unready           = var.scale_down_unready
-    scan_interval                = var.scan_interval
+    # Auto-scaling
+    auto_scaling_enabled = lookup(var.default_node_pool, "auto_scaling", false)
+    min_count            = var.default_node_pool.auto_scaling ? lookup(var.default_node_pool, "min_count", null) : null
+    max_count            = var.default_node_pool.auto_scaling ? lookup(var.default_node_pool, "max_count", null) : null
   }
 
   tags = var.tags
