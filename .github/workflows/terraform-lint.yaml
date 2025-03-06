@@ -1,0 +1,46 @@
+name: Terraform Linter
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-format:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform version
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.1
+
+      - name: Install TFLint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # - name: Terraform Init
+      #   run: terraform init
+
+      # - name: Terraform Validate
+      #   run: terraform validate
+
+      - name: TFLint
+        run: tflint
+
+      - name: tfsec
+        run: tfsec .
