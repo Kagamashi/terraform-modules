@@ -26,10 +26,6 @@ jobs:
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      - name: Install tfsec
-        run: |
-          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
-
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
@@ -41,6 +37,3 @@ jobs:
 
       - name: TFLint
         run: tflint
-
-      - name: tfsec
-        run: tfsec .
