@@ -4,7 +4,7 @@
 
 ```hcl
 module "kv" {
-  source = "./modules/azure_key_vault"  # or a Git URL, etc.
+  source = "git::https://github.com/Kagamashi/terraform-modules.git/key_vault?ref=v1.0.0"
 
   name                = "myUniqueKeyVaultName"
   location            = "West Europe"
@@ -53,14 +53,14 @@ module "kv" {
 ## Notes
 
 ### Unique Name
-- The name of the Key Vault **must be globally unique**.  
+- The name of the Key Vault **must be globally unique**.
 - Once created, if you destroy it while using soft-delete or purge protection, you must **purge** it before reusing the same name.
 
 ---
 
 ### Purge Protection
-- Once `purge_protection_enabled` is set to `true`, it **cannot be reverted to false**.  
-- Attempting to do so will fail because of Azure policy.  
+- Once `purge_protection_enabled` is set to `true`, it **cannot be reverted to false**.
+- Attempting to do so will fail because of Azure policy.
 - Deleting a Key Vault with purge protection enabled will schedule the vault for deletion, which can take up to 90 days.
 
 ---
@@ -78,4 +78,4 @@ module "kv" {
 
 ### State & Sensitive Data
 - Some vault secrets or references may appear in the Terraform state file if used as outputs.
-- **Generally, keep secrets in the vault**, and do **not** output them directly in Terraform. 
+- **Generally, keep secrets in the vault**, and do **not** output them directly in Terraform.

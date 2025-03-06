@@ -4,7 +4,7 @@
 
 ```hcl
 module "aks" {
-  source = "./modules/azure_kubernetes_service"
+  source = "git::https://github.com/Kagamashi/terraform-modules.git/aks?ref=v1.0.0"
 
   name                = "my-aks-cluster"
   location            = "West Europe"
@@ -97,8 +97,8 @@ module "aks" {
 
 ### Node Pools
 
-- This module only defines the **default (system) node pool**.
-- For additional user node pools, you typically define extra `azurerm_kubernetes_cluster_node_pool` resources outside this module.
+- aks module only defines the **default (system) node pool**.
+- For additional user node pools, you typically define extra `azurerm_kubernetes_cluster_node_pool` resources outside aks module.
 
 ---
 
@@ -119,4 +119,4 @@ module "aks" {
 
 ### Add-ons
 
-- You can expand this module to enable other add-ons (OMS Agent, Azure Policy, etc.) by adding more input variables and dynamic blocks.
+- You can expand aks module to enable other add-ons (OMS Agent, Azure Policy, etc.) by adding more input variables and dynamic blocks.

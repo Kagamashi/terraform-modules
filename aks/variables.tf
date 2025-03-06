@@ -16,9 +16,9 @@ variable "resource_group_name" {
 variable "dns_prefix" {
   type        = string
   description = <<EOT
-Optional DNS prefix for the cluster. Must begin and end with a letter or number, 
-contain only letters, numbers, and hyphens, and be 1-54 characters. 
-Changing this forces a new resource to be created.
+Optional DNS prefix for the cluster. Must begin and end with a letter or number,
+contain only letters, numbers, and hyphens, and be 1-54 characters.
+Changing aks forces a new resource to be created.
 EOT
   default     = null
 }
@@ -26,7 +26,7 @@ EOT
 variable "kubernetes_version" {
   type        = string
   description = <<EOT
-Version of Kubernetes to deploy (e.g. 1.25, 1.26.3, etc.). 
+Version of Kubernetes to deploy (e.g. 1.25, 1.26.3, etc.).
 If not specified, the latest recommended version is used.
 EOT
   default     = null
@@ -44,8 +44,8 @@ EOT
 variable "private_cluster_enabled" {
   type        = bool
   description = <<EOT
-Specifies whether this AKS cluster should only have internal IP addresses for 
-the API server. Defaults to false. Changing this forces a new resource to be created.
+Specifies whether aks AKS cluster should only have internal IP addresses for
+the API server. Defaults to false. Changing aks forces a new resource to be created.
 EOT
   default     = false
 }
@@ -53,7 +53,7 @@ EOT
 variable "private_dns_zone_id" {
   type        = string
   description = <<EOT
-Specifies the ID of a Private DNS Zone, "System", or "None" to manage 
+Specifies the ID of a Private DNS Zone, "System", or "None" to manage
 a private AKS cluster. Only used when private_cluster_enabled = true.
 EOT
   default     = null
@@ -97,7 +97,7 @@ variable "default_node_pool" {
     availability_zones = optional(list(string), null) # e.g. ["1","2","3"]
   })
   description = <<EOT
-Configuration for the default (system) node pool. 
+Configuration for the default (system) node pool.
   - name: Node pool name (required).
   - vm_size: Azure VM size (required).
   - node_count: number of nodes (required).
@@ -116,7 +116,7 @@ variable "identity" {
     identity_ids = optional(list(string), null)
   })
   description = <<EOT
-An identity block for the AKS cluster. 
+An identity block for the AKS cluster.
   - type can be "SystemAssigned" or "UserAssigned".
   - identity_ids is required only if type = "UserAssigned".
 EOT
@@ -138,7 +138,7 @@ variable "azure_rbac_enabled" {
 variable "aad_admin_group_object_ids" {
   type        = list(string)
   description = <<EOT
-A list of Azure AD group Object IDs that should have cluster admin role. 
+A list of Azure AD group Object IDs that should have cluster admin role.
 Only used if azure_rbac_enabled = true or for AAD integration.
 EOT
   default     = []

@@ -1,6 +1,4 @@
-##########################
 # Local condition checks #
-##########################
 locals {
   enable_network_rules = var.network_rules != null && (
     var.network_rules.default_action != null ||
@@ -9,10 +7,7 @@ locals {
   )
 }
 
-#################################
-# Azure Storage Account Resource
-#################################
-resource "azurerm_storage_account" "this" {
+resource "azurerm_storage_account" "sa" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -33,7 +28,7 @@ resource "azurerm_storage_account" "this" {
   sftp_enabled                     = var.sftp_enabled
   nfsv3_enabled                    = var.nfsv3_enabled
 
-  # Only define network_rules if user provided them
+  # define network_rules only if provided by user
   dynamic "network_rules" {
     for_each = local.enable_network_rules ? [var.network_rules] : []
     content {

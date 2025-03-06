@@ -1,7 +1,4 @@
-###############################
 # Locals for conditional logic
-###############################
-
 locals {
   sku_is_premium   = lower(var.sku) == "premium"
   sku_is_standard  = lower(var.sku) == "standard"
@@ -12,10 +9,8 @@ locals {
   apply_identity   = var.identity != null
 }
 
-###############################################
-# Azure Container Registry (ACR) Resource
-###############################################
-resource "azurerm_container_registry" "this" {
+# Azure Container Registry (ACR)
+resource "azurerm_container_registry" "acr" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -93,7 +88,7 @@ resource "azurerm_container_registry_cache_rule" "cache_rules" {
   for_each = { for rule in var.cache_rules : rule.name => rule }
 
   name                  = each.value.name
-  container_registry_id = azurerm_container_registry.this.id
+  container_registry_id = azurerm_container_registry.acr.id
   source_repo           = each.value.source_repo
   target_repo           = each.value.target_repo
   credential_set_id     = lookup(each.value, "credential_set_id", null)

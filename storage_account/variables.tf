@@ -30,7 +30,7 @@ EOT
 variable "account_tier" {
   type        = string
   description = <<EOT
-Defines the Tier to use for this storage account.
+Defines the Tier to use for sa storage account.
 Valid options: "Standard", "Premium".
 EOT
   default     = "Standard"
@@ -80,7 +80,7 @@ variable "min_tls_version" {
 
 variable "allow_nested_items_to_be_public" {
   type        = bool
-  description = "Allow or disallow nested items within this account to opt into being public. Defaults to true."
+  description = "Allow or disallow nested items within sa account to opt into being public. Defaults to true."
   default     = true
 }
 
@@ -95,7 +95,7 @@ EOT
 
 variable "public_network_access_enabled" {
   type        = bool
-  description = "Whether the public network access is enabled for this account. Defaults to true."
+  description = "Whether the public network access is enabled for sa account. Defaults to true."
   default     = true
 }
 
@@ -103,7 +103,7 @@ variable "is_hns_enabled" {
   type        = bool
   description = <<EOT
 Is Hierarchical Namespace enabled (for Data Lake Gen2)?
-Changing this forces a new resource to be created.
+Changing sa forces a new resource to be created.
 EOT
   default     = false
 }

@@ -5,7 +5,7 @@ variable "name" {
 
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group where this Container Registry will be created."
+  description = "The name of the resource group where acr Container Registry will be created."
 }
 
 variable "location" {
@@ -88,7 +88,7 @@ variable "zone_redundancy_enabled" {
 variable "export_policy_enabled" {
   type        = bool
   description = <<EOT
-(Premium only) Whether export policy is enabled. Defaults to true. 
+(Premium only) Whether export policy is enabled. Defaults to true.
 In order to set false, public_network_access_enabled must also be false.
 EOT
   default     = true
@@ -109,8 +109,8 @@ variable "network_rule_set" {
   - ip_rules: a list of objects with the properties:
       - action (only "Allow" is supported)
       - ip_range (CIDR to allow)
-  
-If this variable is null or not set, no network_rule_set will be applied.
+
+If acr variable is null or not set, no network_rule_set will be applied.
 EOT
 
   default = null
@@ -133,7 +133,7 @@ variable "anonymous_pull_enabled" {
 
 variable "data_endpoint_enabled" {
   type        = bool
-  description = "(Premium only) Whether to enable dedicated data endpoints for this Container Registry."
+  description = "(Premium only) Whether to enable dedicated data endpoints for acr Container Registry."
   default     = false
 }
 
@@ -178,7 +178,7 @@ variable "cache_rules" {
     credential_set_id = optional(string, null)
   }))
   description = <<EOT
-A list of Cache Rules to create for this Container Registry.
+A list of Cache Rules to create for acr Container Registry.
 Each object must have:
   - name (string)
   - source_repo (string)

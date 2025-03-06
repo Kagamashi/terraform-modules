@@ -45,8 +45,8 @@ variable "enabled_for_template_deployment" {
 variable "enable_rbac_authorization" {
   type        = bool
   description = <<EOT
-Boolean flag to specify whether Azure Key Vault uses Role Based Access Control 
-(RBAC) for authorization of data actions. 
+Boolean flag to specify whether Azure Key Vault uses Role Based Access Control
+(RBAC) for authorization of data actions.
 EOT
   default     = false
 }
@@ -89,7 +89,7 @@ variable "purge_protection_enabled" {
 
 variable "public_network_access_enabled" {
   type        = bool
-  description = "Whether public network access is allowed for this Key Vault."
+  description = "Whether public network access is allowed for akv Key Vault."
   default     = true
 }
 

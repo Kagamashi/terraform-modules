@@ -1,6 +1,4 @@
-##########################
 # Local condition checks #
-##########################
 locals {
   use_identity          = var.identity != null
   identity_is_user      = local.use_identity && lower(var.identity.type) == "userassigned"
@@ -9,10 +7,7 @@ locals {
   private_cluster_logic = var.private_cluster_enabled ? true : false
 }
 
-#################################
-# AKS Resource: azurerm_kubernetes_cluster
-#################################
-resource "azurerm_kubernetes_cluster" "this" {
+resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name

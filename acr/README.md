@@ -3,7 +3,7 @@
 ## Usage:
 ```hcl
 module "acr" {
-  source = "./modules/azure_container_registry"
+  source = "git::https://github.com/Kagamashi/terraform-modules.git/acr?ref=v1.0.0"
 
   name                = "myUniqueACRName"
   resource_group_name = "rg-example"
@@ -80,7 +80,7 @@ module "acr" {
 
 ### ACR Admin Credentials
 
-- If `admin_enabled = true`, Terraform exports `admin_username` and `admin_password`. 
+- If `admin_enabled = true`, Terraform exports `admin_username` and `admin_password`.
 - Use them carefully as they will appear in the Terraform state file in plain text.
 
 ---

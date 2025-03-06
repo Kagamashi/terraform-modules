@@ -15,7 +15,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "storage_account" {
-  source = "./modules/azure_storage_account"  # or a Git/GitHub URL
+  source = "git::https://github.com/Kagamashi/terraform-modules.git/storage_account?ref=v1.0.0"
 
   name                = "mystorageacct123"  # Must be globally unique & all lowercase
   resource_group_name = azurerm_resource_group.example.name
@@ -92,5 +92,5 @@ output "storage_account_primary_access_key" {
 
 
 ### Access Keys in State
-- This module outputs `primary_access_key` and `primary_connection_string`, both marked as **sensitive**.
+- sa module outputs `primary_access_key` and `primary_connection_string`, both marked as **sensitive**.
 - They appear in the Terraform **state file** in plain text. Use them carefully or avoid outputting them if possible.
