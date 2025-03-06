@@ -23,7 +23,7 @@ jobs:
           terraform_version: 1.11.1
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v0.5.0
+        uses: terraform-linters/setup-tflint@v4.1.1
 
       - name: Terraform Format
         run: terraform fmt -recursive
